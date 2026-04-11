@@ -1,0 +1,11 @@
+{
+  "name": "read-scalingminds",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@mozilla/readability": "^0.5.0",
+    "dotenv": "^17.4.1",
+    "jsdom": "^24.0.0",
+    "pdf-parse": "^1.1.1"
+  }
+}

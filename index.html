@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Read — Scaling Minds</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #F7F4EF;
+      color: #2D2D2D;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    h1, h2, h3 { font-family: Georgia, 'Times New Roman', serif; }
+
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      flex: 1;
+      width: 100%;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    header h1 {
+      font-size: 2.4rem;
+      color: #1B4332;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      font-size: 1rem;
+      color: #6B6B6B;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 24px;
+      border-bottom: 2px solid #E0D9CE;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 12px 16px;
+      background: none;
+      border: none;
+      color: #888;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+    }
+
+    .tab:hover { color: #555; }
+
+    .tab.active {
+      color: #1B4332;
+      border-bottom-color: #1B4332;
+      font-weight: 600;
+    }
+
+    /* Input panels */
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    textarea {
+      width: 100%;
+      height: 200px;
+      background: #fff;
+      border: 1px solid #D0C9BC;
+      border-radius: 8px;
+      padding: 16px;
+      color: #2D2D2D;
+      font-family: Arial, sans-serif;
+      font-size: 0.95rem;
+      resize: vertical;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: #1B4332;
+      box-shadow: 0 0 0 3px rgba(27, 67, 50, 0.1);
+    }
+
+    input[type="url"], input[type="file"] {
+      width: 100%;
+      padding: 14px 16px;
+      background: #fff;
+      border: 1px solid #D0C9BC;
+      border-radius: 8px;
+      color: #2D2D2D;
+      font-size: 0.95rem;
+    }
+
+    input[type="url"]:focus {
+      outline: none;
+      border-color: #1B4332;
+      box-shadow: 0 0 0 3px rgba(27, 67, 50, 0.1);
+    }
+
+    input[type="file"] {
+      cursor: pointer;
+    }
+
+    input[type="file"]::file-selector-button {
+      background: #1B4332;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-right: 12px;
+    }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      gap: 16px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .control-group {
+      flex: 1;
+      min-width: 140px;
+    }
+
+    .control-group label {
+      display: block;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+      color: #6B6B6B;
+    }
+
+    select {
+      width: 100%;
+      padding: 10px 12px;
+      background: #fff;
+      border: 1px solid #D0C9BC;
+      border-radius: 6px;
+      color: #2D2D2D;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+
+    select:focus { outline: none; border-color: #1B4332; }
+
+    .speed-control {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    input[type="range"] {
+      flex: 1;
+      accent-color: #1B4332;
+      cursor: pointer;
+    }
+
+    .speed-value {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #1B4332;
+      min-width: 36px;
+      text-align: right;
+    }
+
+    /* Voice preview */
+    .voice-preview {
+      display: none;
+      margin-top: 8px;
+      font-size: 0.82rem;
+      color: #6B6B6B;
+      font-style: italic;
+    }
+
+    .voice-preview.active { display: block; }
+
+    /* Stats bar */
+    .stats {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 16px;
+      font-size: 0.82rem;
+      color: #888;
+    }
+
+    /* Generate button */
+    .generate-btn {
+      width: 100%;
+      margin-top: 28px;
+      padding: 16px;
+      background: #1B4332;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      font-family: Georgia, serif;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.02em;
+    }
+
+    .generate-btn:hover { background: #2D6A4F; }
+
+    .generate-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Progress */
+    .progress {
+      display: none;
+      margin-top: 20px;
+    }
+
+    .progress.active { display: block; }
+
+    .progress-bar {
+      height: 4px;
+      background: #E0D9CE;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: #1B4332;
+      border-radius: 2px;
+      transition: width 0.3s;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    .progress-text {
+      font-size: 0.82rem;
+      margin-top: 8px;
+      color: #6B6B6B;
+      text-align: center;
+    }
+
+    /* Audio player */
+    .player {
+      display: none;
+      margin-top: 28px;
+      background: #fff;
+      border-radius: 12px;
+      padding: 24px;
+      border: 1px solid #E0D9CE;
+    }
+
+    .player.active { display: block; }
+
+    .player h3 {
+      color: #1B4332;
+      margin-bottom: 16px;
+      font-size: 1.1rem;
+    }
+
+    audio {
+      width: 100%;
+      margin-bottom: 16px;
+    }
+
+    .download-btn {
+      display: inline-block;
+      padding: 10px 24px;
+      background: transparent;
+      color: #1B4332;
+      border: 1px solid #1B4332;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .download-btn:hover {
+      background: #1B4332;
+      color: #fff;
+    }
+
+    /* Error */
+    .error {
+      display: none;
+      margin-top: 16px;
+      padding: 12px 16px;
+      background: #FEF2F2;
+      border: 1px solid #FECACA;
+      border-radius: 8px;
+      color: #991B1B;
+      font-size: 0.9rem;
+    }
+
+    .error.active { display: block; }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 24px;
+      font-size: 0.8rem;
+      color: #aaa;
+    }
+
+    @media (max-width: 500px) {
+      header h1 { font-size: 1.8rem; }
+      .controls { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Read</h1>
+      <p>Turn text, articles, and PDFs into audio</p>
+    </header>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="text">Paste Text</button>
+      <button class="tab" data-tab="url">Article URL</button>
+      <button class="tab" data-tab="pdf">Upload PDF</button>
+    </div>
+
+    <div id="panel-text" class="panel active">
+      <textarea id="text-input" placeholder="Paste or type your text here..."></textarea>
+    </div>
+
+    <div id="panel-url" class="panel">
+      <input type="url" id="url-input" placeholder="https://example.com/article">
+    </div>
+
+    <div id="panel-pdf" class="panel">
+      <input type="file" id="pdf-input" accept=".pdf">
+    </div>
+
+    <div class="controls">
+      <div class="control-group">
+        <label>Voice</label>
+        <select id="voice-select">
+          <option value="onyx" selected>Onyx</option>
+          <option value="alloy">Alloy</option>
+          <option value="echo">Echo</option>
+          <option value="fable">Fable</option>
+          <option value="nova">Nova</option>
+          <option value="shimmer">Shimmer</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label>Speed</label>
+        <div class="speed-control">
+          <input type="range" id="speed-slider" min="0.5" max="2" step="0.1" value="1">
+          <span class="speed-value" id="speed-display">1.0x</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats">
+      <span id="char-count">0 characters</span>
+      <span id="cost-estimate">~$0.00</span>
+    </div>
+
+    <button class="generate-btn" id="generate-btn">Generate Audio</button>
+
+    <div class="error" id="error-msg"></div>
+
+    <div class="progress" id="progress">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+      </div>
+      <p class="progress-text" id="progress-text">Preparing...</p>
+    </div>
+
+    <div class="player" id="player">
+      <h3>Your Audio <span id="player-voice" style="font-size:0.8rem;font-weight:400;color:#6B6B6B;font-family:Arial,sans-serif;"></span></h3>
+      <audio id="audio-player" controls></audio>
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+        <a class="download-btn" id="download-btn" download="scaling-minds-read.mp3">Download MP3</a>
+        <button class="download-btn" id="regenerate-btn" style="cursor:pointer;">Regenerate with new settings</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>&copy; Scaling Minds</footer>
+
+  <script>
+    const $ = (s) => document.querySelector(s);
+    const $$ = (s) => document.querySelectorAll(s);
+
+    // State
+    let currentText = "";
+    let activeTab = "text";
+
+    // Tabs
+    $$(".tab").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        $$(".tab").forEach((t) => t.classList.remove("active"));
+        $$(".panel").forEach((p) => p.classList.remove("active"));
+        tab.classList.add("active");
+        activeTab = tab.dataset.tab;
+        $(`#panel-${activeTab}`).classList.add("active");
+        updateStats();
+      });
+    });
+
+    // Speed slider
+    $("#speed-slider").addEventListener("input", (e) => {
+      $("#speed-display").textContent = parseFloat(e.target.value).toFixed(1) + "x";
+    });
+
+    // Text input stats
+    $("#text-input").addEventListener("input", updateStats);
+
+    function updateStats() {
+      let len = 0;
+      if (activeTab === "text") {
+        len = $("#text-input").value.length;
+      }
+      $("#char-count").textContent = len.toLocaleString() + " characters";
+      const cost = (len * 0.000015).toFixed(4);
+      $("#cost-estimate").textContent = `~$${cost}`;
+    }
+
+    function showError(msg) {
+      const el = $("#error-msg");
+      el.textContent = msg;
+      el.classList.add("active");
+    }
+
+    function hideError() {
+      $("#error-msg").classList.remove("active");
+    }
+
+    function setProgress(pct, msg) {
+      $("#progress").classList.add("active");
+      $("#progress-fill").style.width = pct + "%";
+      $("#progress-text").textContent = msg;
+    }
+
+    function hideProgress() {
+      $("#progress").classList.remove("active");
+    }
+
+    // Generate
+    async function generate() {
+      hideError();
+      $("#player").classList.remove("active");
+
+      const btn = $("#generate-btn");
+      btn.disabled = true;
+
+      try {
+        let text = "";
+
+        if (activeTab === "text") {
+          text = $("#text-input").value.trim();
+          if (!text) throw new Error("Please paste or type some text.");
+        } else if (activeTab === "url") {
+          const url = $("#url-input").value.trim();
+          if (!url) throw new Error("Please enter an article URL.");
+          setProgress(20, "Fetching article...");
+          const res = await fetch("/.netlify/functions/fetch-article", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || "Failed to fetch article");
+          text = data.text;
+          if (!text) throw new Error("No readable text found in article.");
+        } else if (activeTab === "pdf") {
+          const file = $("#pdf-input").files[0];
+          if (!file) throw new Error("Please select a PDF file.");
+          if (file.size > 10 * 1024 * 1024) throw new Error("PDF too large. Max 10MB.");
+          setProgress(20, "Parsing PDF...");
+          const reader = new FileReader();
+          const base64 = await new Promise((resolve, reject) => {
+            reader.onload = () => resolve(reader.result.split(",")[1]);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          });
+          const res = await fetch("/.netlify/functions/parse-pdf", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ pdf: base64 }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || "Failed to parse PDF");
+          text = data.text;
+          if (!text) throw new Error("No text found in PDF.");
+        }
+
+        // Update stats with actual text length
+        currentText = text;
+        $("#char-count").textContent = text.length.toLocaleString() + " characters";
+        const cost = (text.length * 0.000015).toFixed(4);
+        $("#cost-estimate").textContent = `~$${cost}`;
+
+        if (text.length > 100000) {
+          throw new Error("Text is too long (max 100,000 characters). Try a shorter article.");
+        }
+
+        const voice = $("#voice-select").value;
+        const speed = parseFloat($("#speed-slider").value);
+        const chunks = chunkText(text, 4000);
+
+        setProgress(30, `Generating audio (${chunks.length} chunk${chunks.length > 1 ? "s" : ""})...`);
+
+        // Fire all chunks in parallel, each under the 10s function timeout
+        let completed = 0;
+        const audioBuffers = await Promise.all(
+          chunks.map(async (chunk, i) => {
+            const ttsRes = await fetch("/api/tts", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ text: chunk, voice, speed }),
+            });
+
+            if (!ttsRes.ok) {
+              let errMsg = "Failed to generate audio";
+              try {
+                const errData = await ttsRes.json();
+                errMsg = errData.error || errMsg;
+              } catch {}
+              throw new Error(errMsg);
+            }
+
+            completed++;
+            const pct = 30 + Math.round((completed / chunks.length) * 60);
+            setProgress(pct, `Generated ${completed}/${chunks.length} chunks...`);
+
+            return await ttsRes.arrayBuffer();
+          })
+        );
+
+        setProgress(95, "Stitching audio...");
+
+        // Combine all MP3 buffers
+        const totalSize = audioBuffers.reduce((s, b) => s + b.byteLength, 0);
+        const combined = new Uint8Array(totalSize);
+        let offset = 0;
+        for (const buf of audioBuffers) {
+          combined.set(new Uint8Array(buf), offset);
+          offset += buf.byteLength;
+        }
+
+        const blob = new Blob([combined], { type: "audio/mpeg" });
+        const audioUrl = URL.createObjectURL(blob);
+
+        $("#audio-player").src = audioUrl;
+        $("#download-btn").href = audioUrl;
+        $("#player").classList.add("active");
+
+        $("#player-voice").textContent = `— ${voice}, ${speed.toFixed(1)}x`;
+        lastGeneratedVoice = voice;
+        lastGeneratedSpeed = speed;
+
+        setProgress(100, "Done!");
+        setTimeout(hideProgress, 1000);
+      } catch (err) {
+        hideProgress();
+        showError(err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    let lastGeneratedVoice = "";
+    let lastGeneratedSpeed = 1;
+
+    $("#generate-btn").addEventListener("click", generate);
+
+    // Regenerate button re-runs TTS with the last text but new voice/speed
+    $("#regenerate-btn").addEventListener("click", () => {
+      generate();
+    });
+
+    // Highlight regenerate button when voice or speed changes after generation
+    $("#voice-select").addEventListener("change", highlightRegenerate);
+    $("#speed-slider").addEventListener("change", highlightRegenerate);
+
+    function chunkText(text, maxLen) {
+      const chunks = [];
+      let remaining = text;
+      while (remaining.length > 0) {
+        if (remaining.length <= maxLen) { chunks.push(remaining); break; }
+        let splitAt = -1;
+        for (const ender of [". ", "! ", "? ", ".\n", "!\n", "?\n"]) {
+          const idx = remaining.lastIndexOf(ender, maxLen);
+          if (idx > 0 && idx > splitAt) splitAt = idx + ender.length;
+        }
+        if (splitAt <= 0) { const i = remaining.lastIndexOf("\n\n", maxLen); if (i > 0) splitAt = i + 2; }
+        if (splitAt <= 0) { const i = remaining.lastIndexOf("\n", maxLen); if (i > 0) splitAt = i + 1; }
+        if (splitAt <= 0) { const i = remaining.lastIndexOf(" ", maxLen); if (i > 0) splitAt = i + 1; }
+        if (splitAt <= 0) splitAt = maxLen;
+        chunks.push(remaining.substring(0, splitAt));
+        remaining = remaining.substring(splitAt);
+      }
+      return chunks;
+    }
+
+    function highlightRegenerate() {
+      const btn = $("#regenerate-btn");
+      if (!$("#player").classList.contains("active")) return;
+      const voice = $("#voice-select").value;
+      const speed = parseFloat($("#speed-slider").value);
+      if (voice !== lastGeneratedVoice || speed !== lastGeneratedSpeed) {
+        btn.style.background = "#1B4332";
+        btn.style.color = "#fff";
+      } else {
+        btn.style.background = "transparent";
+        btn.style.color = "#1B4332";
+      }
+    }
+  </script>
+</body>
+</html>
